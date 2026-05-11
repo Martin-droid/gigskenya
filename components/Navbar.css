@@ -1,0 +1,5 @@
+@media (max-width: 820px) {
+  .desk { display: none !important; }
+  .mob-btn { display: flex !important; }
+  .mob-cta-bar { display: flex !important; }
+}
