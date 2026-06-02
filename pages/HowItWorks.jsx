@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 import {
   ArrowRight, FileText, Search, MessageSquare, Phone,
   Users, Briefcase, Zap, Shield, Globe, Star,
@@ -125,6 +126,13 @@ export default function HowItWorks() {
   const steps = tab === 'hirer' ? HIRER_STEPS : TALENT_STEPS;
 
   return (
+    <>
+    <SEO
+      title="How GigsKenya Works | Find Jobs, Hire Talent & Earn via M-Pesa in Kenya"
+      description="Learn how GigsKenya connects Kenyan freelancers with businesses. Post a free job ad, browse top talent, contact directly. No commission, no middleman. Freelancers get paid via M-Pesa. Start in under 2 minutes."
+      keywords="how to hire freelancers Kenya, how to find work Kenya, how to get a job in Kenya, how to start freelancing in Kenya, freelancing in Kenya for beginners, how to get clients as a freelancer Kenya, best freelancing platforms Kenya, how to make money freelancing Kenya, freelance marketplace Kenya, post job Kenya, find gigs Nairobi, earn money online Kenya M-Pesa, how GigsKenya works, ajira digital Kenya, kazi online Kenya, side hustle Kenya, legit online jobs Kenya"
+      canonical="/how-it-works"
+    />
     <div style={{ paddingTop: 68 }}>
 
       {/* Hero */}
@@ -312,5 +320,6 @@ export default function HowItWorks() {
       </section>
 
     </div>
+    </>
   );
 }

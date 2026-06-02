@@ -8,6 +8,7 @@ import { getAds } from '../lib/firestore';
 import { requireAuth } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
 import './Home.css';
+import SEO from '../components/SEO';
 
 /* ─────────────────────────────────────────────────────────────
    Config
@@ -134,7 +135,7 @@ function PageBtn({ active, disabled, onClick, children }) {
     <button
       disabled={disabled}
       onClick={onClick}
-      style={{ minWidth: 40, height: 40, padding: '0 12px', borderRadius: 10, border: `1.5px solid ${active ? 'var(--green)' : '#E5E7EB'}`, background: active ? 'var(--green)' : disabled ? '#F9FAFB' : 'white', color: active ? 'white' : disabled ? '#D1D5DB' : '#111827', fontSize: 13, fontWeight: 700, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-display)', transition: 'all .15s', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}
+      style={{ minWidth: 44, minHeight: 44, padding: '0 12px', borderRadius: 10, border: `1.5px solid ${active ? 'var(--green)' : '#E5E7EB'}`, background: active ? 'var(--green)' : disabled ? '#F9FAFB' : 'white', color: active ? 'white' : disabled ? '#D1D5DB' : '#111827', fontSize: 13, fontWeight: 700, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-display)', transition: 'all .15s', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}
     >{children}</button>
   );
 }
@@ -463,7 +464,27 @@ export default function Browse() {
     ? `${catLabel} ${typeLabel} in Kenya`
     : type !== 'all' ? `${typeLabel} in Kenya` : 'All Freelancers & Jobs in Kenya';
 
+  const yr = new Date().getFullYear();
+  const browseTitle = cat !== 'all'
+    ? `${catLabel} Jobs & Freelancers in Kenya ${yr}`
+    : type === 'job'     ? `Latest Jobs in Kenya ${yr} | Vacancies, Part Time & Remote Work`
+    : type === 'service' ? `Hire Freelancers in Kenya ${yr} | Browse Top Kenyan Talent`
+    : `Jobs & Freelancers in Kenya ${yr} | Kazi Kenya, Online Work & Hire`;
+
+  const browseDesc = cat !== 'all'
+    ? `Browse ${catLabel.toLowerCase()} jobs and freelancers in Kenya. Find and hire top ${catLabel.toLowerCase()} professionals in Nairobi, Mombasa, Kisumu & remote. Direct contact, pay via M-Pesa.`
+    : type === 'job'
+      ? `Latest job vacancies in Kenya ${yr}. Full time, part time, remote & freelance jobs in Nairobi, Mombasa, Kisumu, Nakuru & across Kenya. Online jobs that pay via M-Pesa. Fresh graduate & entry level jobs included.`
+      : `Hire top Kenyan freelancers across tech, design, writing, marketing, photography, accounting & more. Browse talent in Nairobi, Mombasa, Kisumu & remote. Direct contact, no commission, pay via M-Pesa.`;
+
   return (
+    <>
+    <SEO
+      title={browseTitle}
+      description={browseDesc}
+      keywords={`jobs in Kenya, jobs in Nairobi, Kenya jobs ${yr}, latest jobs Kenya, job vacancies Kenya, freelance jobs Kenya, online jobs Kenya, kazi Kenya, ajira Kenya, tafuta kazi, work from home Kenya, remote jobs Kenya, part time jobs Kenya, side hustle Kenya, gig work Kenya, online jobs that pay via M-Pesa, online jobs Kenya no experience, fresh graduate jobs Kenya, entry level jobs Nairobi, jobs for students Kenya, work from home Nairobi, tech jobs Kenya, software developer jobs Kenya, graphic design jobs Kenya, digital marketing jobs Kenya, content writing jobs Kenya, accounting jobs Kenya, data entry jobs Kenya, transcription jobs Kenya, social media jobs Kenya, jobs Mombasa, jobs Kisumu, jobs Nakuru, jobs Eldoret, jobs Thika, county jobs Kenya, NGO jobs Kenya, internship Kenya, casual jobs Kenya, jua kali jobs Kenya`}
+      canonical="/browse"
+    />
     <div style={{ paddingTop: 64, minHeight: '100vh', background: '#F9FAFB' }}>
 
       {/* Hidden H1 for SEO */}
@@ -697,5 +718,6 @@ export default function Browse() {
         }
       `}</style>
     </div>
+    </>
   );
 }

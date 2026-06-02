@@ -89,6 +89,24 @@ function SearchableSelect({ options, value, onChange, placeholder = 'Search or s
   );
 }
 
+// Resize + compress to JPEG before upload — brings 3–8 MB phone photos down to ~80 KB
+const compressImage = (file, maxPx = 480, quality = 0.82) =>
+  new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => resolve(blob ?? file), 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+
 // ── Profile Image Uploader ────────────────────────────────────────
 function ProfileImageUploader({ uid, folder = 'profile_images', currentUrl, onUploaded, onUploadingChange, size = 72 }) {
   const [uploading, setUploading] = useState(false);
@@ -111,7 +129,7 @@ function ProfileImageUploader({ uid, folder = 'profile_images', currentUrl, onUp
     onUploadingChange?.(val);
   };
 
-  const handleFile = file => {
+  const handleFile = async file => {
     if (!file) return;
     if (!file.type.startsWith('image/')) { setErr('Please select an image file.'); return; }
     if (file.size > 5 * 1024 * 1024) { setErr('Image must be under 5 MB.'); return; }
@@ -120,8 +138,9 @@ function ProfileImageUploader({ uid, folder = 'profile_images', currentUrl, onUp
     const blobUrl = URL.createObjectURL(file);
     blobUrlRef.current = blobUrl;
     setPreview(blobUrl);
-    const storageRef = ref(storage, `${folder}/${uid}/${Date.now()}_${file.name}`);
-    const task = uploadBytesResumable(storageRef, file);
+    const compressed = await compressImage(file);
+    const storageRef = ref(storage, `${folder}/${uid}/${Date.now()}_photo.jpg`);
+    const task = uploadBytesResumable(storageRef, compressed, { contentType: 'image/jpeg' });
     setUploading_(true);
     task.on('state_changed',
       snap => setProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
@@ -580,7 +599,7 @@ function TalentProfileForm({ uid, existing, displayName, userPhotoURL, onSuccess
             ) : <p style={{ fontSize: 13, color: '#94A3B8', padding: '10px 0' }}>← Go back and select a category</p>}
           </Fld>
           <Fld label="Your Rate" hint="What you charge — shown on your public profile">
-            <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 140px', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'clamp(70px,22vw,90px) 1fr clamp(100px,30vw,140px)', gap: 8 }}>
               <Select value={form.currency} onChange={e => set('currency', e.target.value)}>
                 {['KES','USD','EUR','GBP'].map(c => <option key={c} value={c}>{c}</option>)}
               </Select>

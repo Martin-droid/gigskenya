@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Phone, MessageSquare, ChevronDown, X, Link as LinkIcon, FileDown, SlidersHorizontal, ArrowRight, Zap, Lock } from 'lucide-react';
-import { getTalents } from '../lib/firestore';
+import { getTalents, getTalentsCount } from '../lib/firestore';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const LOCS = ['All Kenya','Nairobi','Mombasa','Kisumu','Nakuru','Eldoret','Thika','Remote'];
 const CATS = ['All','Tech & Dev','Design','Writing & Content','Digital Marketing','Photo & Video','Business & Finance','Customer Support','Translation','Education & Tutoring','Other'];
@@ -106,61 +107,175 @@ function Skeleton() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TalentCard
-   
-   Props:
-   - talent: talent object
-   - navigate: react-router navigate fn
-   - variant: 'default' (full contact reveal) | 'preview' (homepage — no contact, CTA leads to profile)
+   TalentCard — world-class redesign
+   variant: 'preview' (homepage) | 'default' (talent page)
 ═══════════════════════════════════════════════════════════ */
 export function TalentCard({ talent, navigate, variant = 'default' }) {
   const [contactShown, setContactShown] = useState(false);
+  const [hov, setHov] = useState(false);
   const isPreview = variant === 'preview';
 
   const color    = getColor(talent.id);
   const initials = getInitials(talent.posterName);
   const catBg    = catBgColors[talent.category]   || '#F6F6F4';
   const catText  = catTextColors[talent.category] || 'var(--grey-600)';
+  const isAvailable = talent.available !== false;
 
   const goToProfile = () => navigate(`/talent/${talent.id}`);
 
-  /* Entire card navigates to profile on click.
-     The contact button stops propagation so it doesn't trigger card click. */
+  /* ─── Preview variant: clean Toptal-style profile card ─── */
+  if (isPreview) {
+    return (
+      <div
+        role="link" tabIndex={0}
+        onClick={goToProfile}
+        onKeyDown={e => { if (e.key==='Enter'||e.key===' ') goToProfile(); }}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={{
+          background: 'white',
+          borderRadius: 18,
+          overflow: 'hidden',
+          cursor: 'pointer',
+          border: `1.5px solid ${hov ? '#D1D5DB' : '#E5E7EB'}`,
+          boxShadow: hov ? '0 20px 48px rgba(0,0,0,.1)' : '0 1px 4px rgba(0,0,0,.05)',
+          transform: hov ? 'translateY(-4px)' : 'none',
+          transition: 'all .22s cubic-bezier(.4,0,.2,1)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Top accent bar */}
+        <div style={{ height: 3, background: talent.boosted ? 'linear-gradient(90deg,#00A550,#22D37A)' : `linear-gradient(90deg,${color},${color}77)` }}/>
+
+        <div style={{ padding:'18px 20px', flex:1, display:'flex', flexDirection:'column' }}>
+
+          {/* Top row: avatar + info + availability */}
+          <div style={{ display:'flex', alignItems:'flex-start', gap:12, marginBottom:14 }}>
+            {/* Avatar */}
+            <div style={{
+              width:52, height:52, borderRadius:14, flexShrink:0, overflow:'hidden',
+              background: `linear-gradient(145deg,${color},${color}99)`,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              fontWeight:800, fontSize:17, color:'white',
+              boxShadow: `0 4px 14px ${color}33`,
+            }}>
+              {talent.photoURL
+                ? <img src={talent.photoURL} alt={talent.posterName} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>{ e.target.style.display='none'; }}/>
+                : initials}
+            </div>
+
+            <div style={{ flex:1, minWidth:0 }}>
+              <p style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:14.5, color:'#0F172A', lineHeight:1.2, marginBottom:3, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                {talent.posterName || 'Talent'}
+              </p>
+              <p style={{ fontSize:12.5, color:'#374151', fontWeight:600, lineHeight:1.3, marginBottom:4, display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+                {talent.title || 'Freelance Professional'}
+              </p>
+              <p style={{ fontSize:11, color:'#9CA3AF', display:'flex', alignItems:'center', gap:3 }}>
+                <MapPin size={10} strokeWidth={2.5}/>{talent.location || 'Kenya'}
+              </p>
+            </div>
+
+            {/* Availability */}
+            <div style={{ flexShrink:0, display:'flex', alignItems:'center', gap:5, padding:'4px 9px', borderRadius:999, background: isAvailable ? '#F0FDF4' : '#F9FAFB', border:`1px solid ${isAvailable ? 'rgba(34,197,94,.3)' : '#E5E7EB'}` }}>
+              <div style={{ width:6, height:6, borderRadius:'50%', background: isAvailable ? '#22C55E' : '#D1D5DB', animation: isAvailable ? 'pulse-dot 2s infinite' : 'none' }}/>
+              <span style={{ fontSize:10, fontWeight:700, color: isAvailable ? '#15803D' : '#9CA3AF', whiteSpace:'nowrap' }}>
+                {isAvailable ? 'Available' : 'Busy'}
+              </span>
+            </div>
+          </div>
+
+          {/* Category + badges */}
+          <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10 }}>
+            {talent.category && (
+              <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:7, background:catBg, color:catText, letterSpacing:'.04em', textTransform:'uppercase' }}>
+                {talent.category}
+              </span>
+            )}
+            {talent.portfolioUrl && (
+              <span style={{ fontSize:10, fontWeight:600, padding:'3px 8px', borderRadius:7, background:'#F0FDF4', color:'#166534', display:'flex', alignItems:'center', gap:3 }}>
+                <LinkIcon size={9}/> Portfolio
+              </span>
+            )}
+            {talent.cvUrl && (
+              <span style={{ fontSize:10, fontWeight:600, padding:'3px 8px', borderRadius:7, background:'#F9FAFB', color:'#4B5563', display:'flex', alignItems:'center', gap:3 }}>
+                <FileDown size={9}/> CV
+              </span>
+            )}
+            {talent.boosted && (
+              <span style={{ fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:7, background:'#00A550', color:'white' }}>★ Featured</span>
+            )}
+          </div>
+
+          {/* Bio */}
+          {talent.bio && (
+            <p style={{ fontSize:12.5, color:'#6B7280', lineHeight:1.7, marginBottom:12, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+              {talent.bio}
+            </p>
+          )}
+
+          {/* Skills */}
+          {talent.skills?.length > 0 && (
+            <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:14 }}>
+              {talent.skills.slice(0,4).map(s=>(
+                <span key={s} style={{ fontSize:11, background:'#F0FDF4', color:'#166534', padding:'3px 9px', borderRadius:7, fontWeight:600, border:'1px solid rgba(0,165,80,.15)' }}>{s}</span>
+              ))}
+              {talent.skills.length > 4 && <span style={{ fontSize:11, color:'#9CA3AF', alignSelf:'center' }}>+{talent.skills.length-4}</span>}
+            </div>
+          )}
+
+          <div style={{ flex:1 }}/>
+
+          {/* Footer */}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:12, borderTop:'1px solid #F3F4F6', gap:8 }}>
+            <div>
+              <p style={{ fontWeight:800, fontSize:15, color:'#0F172A', margin:0 }}>
+                {talent.rate
+                  ? `${talent.currency || 'KES'} ${Number(talent.rate).toLocaleString('en-KE') || talent.rate}`
+                  : 'Negotiable'}
+              </p>
+              {talent.rate && talent.rateType && talent.rateType !== 'negotiable' && (
+                <p style={{ fontSize:10.5, color:'#9CA3AF', marginTop:1 }}>per {talent.rateType}</p>
+              )}
+            </div>
+            <button
+              onClick={e => { e.stopPropagation(); navigate(`/talent/${talent.id}`); }}
+              style={{
+                display:'flex', alignItems:'center', gap:6,
+                padding:'9px 16px', borderRadius:10,
+                background: hov ? '#00A550' : '#F0FDF4',
+                color: hov ? 'white' : '#166534',
+                border:'none', fontSize:12, fontWeight:700,
+                cursor:'pointer', transition:'background .2s, color .2s', flexShrink:0,
+              }}
+            >
+              View Profile <ArrowRight size={11}/>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─── Default variant: talent page card with contact reveal ─── */
   return (
     <div
-      role="link"
-      tabIndex={0}
+      role="link" tabIndex={0}
       onClick={goToProfile}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') goToProfile(); }}
       className="talent-card-clickable"
-      style={{
-        border: `1.5px solid ${talent.boosted ? 'var(--green)' : 'var(--grey-200)'}`,
-      }}
-      onMouseOver={e => {
-        e.currentTarget.style.borderColor = talent.boosted ? 'var(--green)' : color;
-      }}
-      onMouseOut={e => {
-        e.currentTarget.style.borderColor = talent.boosted ? 'var(--green)' : 'var(--grey-200)';
-      }}
+      style={{ border: `1.5px solid ${talent.boosted ? 'var(--green)' : 'var(--grey-200)'}` }}
+      onMouseOver={e => { e.currentTarget.style.borderColor = talent.boosted ? 'var(--green)' : color; }}
+      onMouseOut={e  => { e.currentTarget.style.borderColor = talent.boosted ? 'var(--green)' : 'var(--grey-200)'; }}
     >
       {/* Accent bar */}
-      <div style={{
-        height: 5,
-        background: talent.boosted
-          ? 'linear-gradient(90deg,var(--green),var(--green-dark))'
-          : `linear-gradient(90deg,${color},${color}99)`,
-      }} />
+      <div style={{ height:4, background: talent.boosted ? 'linear-gradient(90deg,var(--green),#22D37A)' : `linear-gradient(90deg,${color},${color}88)` }}/>
 
-      <div style={{ padding: '18px' }}>
-        {/* Top row: avatar + name + availability */}
+      <div style={{ padding:'18px' }}>
+        {/* Top row */}
         <div className="talent-card-toprow" style={{ display:'flex', gap:12, marginBottom:13, alignItems:'flex-start' }}>
-          <div style={{
-            width:52, height:52, borderRadius:'50%',
-            background:`${color}18`, border:`2px solid ${color}30`,
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontFamily:'var(--font-display)', fontWeight:800, fontSize:17, color,
-            flexShrink:0, overflow:'hidden',
-          }}>
+          <div style={{ width:52, height:52, borderRadius:15, background:`${color}16`, border:`2px solid ${color}28`, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:17, color, flexShrink:0, overflow:'hidden' }}>
             {talent.photoURL
               ? <img src={talent.photoURL} alt={talent.posterName} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>{ e.target.style.display='none'; }}/>
               : initials}
@@ -173,20 +288,15 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
               <MapPin size={11}/> {talent.location || 'Kenya'}
             </p>
           </div>
-          {/* Availability badge */}
-          <div style={{ display:'flex', alignItems:'center', gap:5, flexShrink:0, background: talent.available !== false ? '#F0FDF4' : 'var(--grey-100)', borderRadius:'var(--r-full)', padding:'4px 9px' }}>
-            <div style={{
-              width:6, height:6, borderRadius:'50%',
-              background: talent.available !== false ? '#22C55E' : '#D1D5DB',
-              animation: talent.available !== false ? 'pulse-dot 2s infinite' : 'none',
-            }}/>
-            <span style={{ fontSize:10, fontWeight:700, color: talent.available !== false ? '#15803D' : 'var(--grey-400)', whiteSpace:'nowrap' }}>
-              {talent.available !== false ? 'Available' : 'Busy'}
+          <div style={{ display:'flex', alignItems:'center', gap:5, flexShrink:0, background: isAvailable ? '#F0FDF4' : 'var(--grey-100)', borderRadius:'var(--r-full)', padding:'4px 9px' }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background: isAvailable ? '#22C55E' : '#D1D5DB', animation: isAvailable ? 'pulse-dot 2s infinite' : 'none' }}/>
+            <span style={{ fontSize:10, fontWeight:700, color: isAvailable ? '#15803D' : 'var(--grey-400)', whiteSpace:'nowrap' }}>
+              {isAvailable ? 'Available' : 'Busy'}
             </span>
           </div>
         </div>
 
-        {/* Category + badges */}
+        {/* Badges */}
         <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:10, alignItems:'center' }}>
           {talent.category && (
             <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:'var(--r-full)', background:catBg, color:catText, letterSpacing:'.04em', textTransform:'uppercase' }}>
@@ -204,7 +314,9 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
             </span>
           )}
           {talent.boosted && (
-            <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:'var(--r-full)', background:'var(--green)', color:'white' }}><Zap size={9} fill="white"/> Featured</span>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:'var(--r-full)', background:'var(--green)', color:'white' }}>
+              <Zap size={9} fill="white"/> Featured
+            </span>
           )}
         </div>
 
@@ -213,9 +325,9 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
           {talent.title || 'Freelance Professional'}
         </h3>
 
-        {/* Bio snippet */}
+        {/* Bio */}
         {talent.bio && (
-          <p style={{ fontSize:12, color:'var(--grey-500)', lineHeight:1.6, marginBottom:11 }}>
+          <p style={{ fontSize:12, color:'var(--grey-500)', lineHeight:1.65, marginBottom:11 }}>
             {talent.bio.slice(0,95)}{talent.bio.length > 95 ? '…' : ''}
           </p>
         )}
@@ -226,13 +338,11 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
             {talent.skills.slice(0,3).map(s=>(
               <span key={s} style={{ fontSize:11, background:`${color}10`, color, padding:'3px 9px', borderRadius:'var(--r-sm)', fontWeight:600 }}>{s}</span>
             ))}
-            {talent.skills.length > 3 && (
-              <span style={{ fontSize:11, color:'var(--grey-400)', alignSelf:'center' }}>+{talent.skills.length-3}</span>
-            )}
+            {talent.skills.length > 3 && <span style={{ fontSize:11, color:'var(--grey-400)', alignSelf:'center' }}>+{talent.skills.length-3}</span>}
           </div>
         )}
 
-        {/* Bottom: rate + action button */}
+        {/* Footer */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:12, borderTop:'1px solid var(--grey-100)', gap:8 }}>
           <div style={{ minWidth:0 }}>
             <p style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:15, color:'var(--ink)', letterSpacing:'-.02em', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
@@ -241,110 +351,51 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
                 : 'Negotiable'}
             </p>
             <p style={{ fontSize:11, color:'var(--grey-400)', marginTop:1 }}>
-              {talent.rate && talent.rateType && talent.rateType !== 'negotiable'
-                ? `per ${talent.rateType}`
-                : talent.experience || ''}
+              {talent.rate && talent.rateType && talent.rateType !== 'negotiable' ? `per ${talent.rateType}` : talent.experience || ''}
             </p>
           </div>
 
-          {isPreview ? (
-            /* ── PREVIEW variant (homepage): no contact reveal, link to profile ── */
-            <button
-              onClick={e => { e.stopPropagation(); navigate(`/talent/${talent.id}`); }}
-              style={{
-                display:'flex', alignItems:'center', gap:6,
-                padding:'8px 14px', borderRadius:'var(--r-sm)',
-                background:'var(--green-light)',
-                color:'var(--green-dark)',
-                border:'1.5px solid rgba(0,165,80,.2)',
-                fontSize:12, fontWeight:700,
-                cursor:'pointer', transition:'all .15s', flexShrink:0,
-              }}
-              onMouseOver={e => { e.stopPropagation(); e.currentTarget.style.background='var(--green)'; e.currentTarget.style.color='white'; e.currentTarget.style.borderColor='var(--green)'; }}
-              onMouseOut={e => { e.stopPropagation(); e.currentTarget.style.background='var(--green-light)'; e.currentTarget.style.color='var(--green-dark)'; e.currentTarget.style.borderColor='rgba(0,165,80,.2)'; }}
-            >
-              View Profile <ArrowRight size={11}/>
-            </button>
-          ) : talent.hidePhone ? (
-            /* ── Phone hidden — message only ── */
+          {talent.hidePhone ? (
             <span style={{ display:'flex', alignItems:'center', gap:5, padding:'7px 12px', borderRadius:'var(--r-sm)', background:'#FEF2F2', color:'#DC2626', fontSize:11, fontWeight:700, flexShrink:0 }}>
               <Lock size={11}/> Message only
             </span>
           ) : (
-            /* ── DEFAULT variant (talent page): full contact reveal ── */
             <button
               onClick={e => { e.stopPropagation(); setContactShown(v=>!v); }}
-              style={{
-                display:'flex', alignItems:'center', gap:6,
-                padding:'8px 14px', borderRadius:'var(--r-sm)',
-                background: contactShown ? '#1a1a1a' : color,
-                color: 'white',
-                border: 'none', fontSize:12, fontWeight:700,
-                cursor:'pointer', transition:'all .15s', flexShrink:0,
-                opacity: contactShown ? 0.75 : 1,
-              }}
+              style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:'var(--r-sm)', background: contactShown ? '#1a1a1a' : color, color:'white', border:'none', fontSize:12, fontWeight:700, cursor:'pointer', transition:'all .15s', flexShrink:0, opacity: contactShown ? 0.75 : 1 }}
             >
               <Phone size={12}/> {contactShown ? 'Hide' : 'Contact'}
             </button>
           )}
         </div>
 
-        {/* Contact reveal — default variant only, phone not hidden */}
-        {!isPreview && !talent.hidePhone && contactShown && (
-          <div
-            style={{ marginTop:12, padding:'12px 14px', background:'var(--green-light)', borderRadius:'var(--r-md)', border:'1px solid rgba(0,165,80,.15)' }}
-            onClick={e => e.stopPropagation()}
-          >
+        {/* Contact reveal */}
+        {!talent.hidePhone && contactShown && (
+          <div style={{ marginTop:12, padding:'12px 14px', background:'var(--green-light)', borderRadius:'var(--r-md)', border:'1px solid rgba(0,165,80,.15)' }} onClick={e => e.stopPropagation()}>
             {talent.phone ? (
               <>
-                <p style={{ fontSize:12, color:'var(--grey-500)', marginBottom:8 }}>
-                  Contact {talent.posterName?.split(' ')[0] || 'them'} directly:
-                </p>
+                <p style={{ fontSize:12, color:'var(--grey-500)', marginBottom:8 }}>Contact {talent.posterName?.split(' ')[0] || 'them'} directly:</p>
                 <div className="contact-btns">
-                  <a
-                    href={`tel:${talent.phone}`}
-                    onClick={e => e.stopPropagation()}
-                    style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:'var(--r-sm)', background:'var(--ink)', color:'white', fontWeight:700, fontSize:13, textDecoration:'none', whiteSpace:'nowrap' }}
-                  >
+                  <a href={`tel:${talent.phone}`} onClick={e=>e.stopPropagation()} style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:'var(--r-sm)', background:'var(--ink)', color:'white', fontWeight:700, fontSize:13, textDecoration:'none', whiteSpace:'nowrap' }}>
                     <Phone size={13}/> {talent.phone}
                   </a>
                   {talent.whatsapp !== false && (
-                    <a
-                      href={`https://wa.me/254${talent.phone.replace(/^0/,'').replace(/\s/g,'')}`}
-                      target="_blank" rel="noopener noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:'var(--r-sm)', background:'#25D366', color:'white', fontWeight:700, fontSize:13, textDecoration:'none', whiteSpace:'nowrap' }}
-                    >
+                    <a href={`https://wa.me/254${talent.phone.replace(/^0/,'').replace(/\s/g,'')}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:'var(--r-sm)', background:'#25D366', color:'white', fontWeight:700, fontSize:13, textDecoration:'none', whiteSpace:'nowrap' }}>
                       <MessageSquare size={13}/> WhatsApp
                     </a>
                   )}
                 </div>
-                <button
-                  onClick={e => { e.stopPropagation(); navigate(`/talent/${talent.id}`); }}
-                  style={{ marginTop:10, fontSize:12, color:'var(--grey-500)', background:'none', border:'none', cursor:'pointer', fontWeight:500, display:'block' }}
-                >
+                <button onClick={e=>{ e.stopPropagation(); navigate(`/talent/${talent.id}`); }} style={{ marginTop:10, fontSize:12, color:'var(--grey-500)', background:'none', border:'none', cursor:'pointer', fontWeight:500, display:'block' }}>
                   View full profile →
                 </button>
               </>
             ) : (
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <p style={{ fontSize:13, color:'var(--grey-500)' }}>No contact number provided.</p>
-                <button
-                  onClick={e => { e.stopPropagation(); navigate(`/talent/${talent.id}`); }}
-                  style={{ fontSize:12, color:'var(--green-dark)', background:'none', border:'none', cursor:'pointer', fontWeight:700 }}
-                >
-                  View profile →
-                </button>
+                <button onClick={e=>{ e.stopPropagation(); navigate(`/talent/${talent.id}`); }} style={{ fontSize:12, color:'var(--green-dark)', background:'none', border:'none', cursor:'pointer', fontWeight:700 }}>View profile →</button>
               </div>
             )}
           </div>
-        )}
-
-        {/* Preview variant: subtle "click card to view" hint */}
-        {isPreview && (
-          <p style={{ marginTop:10, fontSize:11, color:'var(--grey-300)', textAlign:'center', letterSpacing:'.02em' }}>
-            Click anywhere to view full profile
-          </p>
         )}
       </div>
     </div>
@@ -355,6 +406,7 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
 export default function Talent() {
   const [talents, setTalents]     = useState([]);
   const [loading, setLoading]     = useState(true);
+  const [totalCount, setTotalCount] = useState(null);
   const [q, setQ]                 = useState('');
   const [loc, setLoc]             = useState('All Kenya');
   const [cat, setCat]             = useState('All');
@@ -369,6 +421,7 @@ export default function Talent() {
       .then(data => setTalents(data))
       .catch(() => setTalents([]))
       .finally(() => setLoading(false));
+    getTalentsCount().then(setTotalCount).catch(() => {});
   }, []);
 
   const filtered = useMemo(() => {
@@ -392,6 +445,12 @@ export default function Talent() {
 
   return (
     <>
+      <SEO
+        title={`Hire Freelancers in Kenya ${new Date().getFullYear()} | Top Kenyan Talent — Nairobi, Mombasa, Kisumu`}
+        description="Find & hire verified Kenyan freelancers — developers, designers, writers, social media managers, photographers, accountants & more. Browse talent in Nairobi, Mombasa, Kisumu & remote. Direct contact, no commission, pay via M-Pesa."
+        keywords="hire freelancers Kenya, Kenyan freelancers, freelancers Nairobi, hire web developer Kenya, hire graphic designer Nairobi, hire content writer Kenya, hire social media manager Kenya, hire virtual assistant Kenya, hire photographer Nairobi, hire accountant Kenya, hire digital marketer Kenya, hire software developer Nairobi, hire SEO specialist Kenya, hire data analyst Kenya, hire video editor Kenya, hire UI UX designer Kenya, hire lawyer Kenya, hire event planner Nairobi, hire tutor Nairobi, hire fundi Nairobi, find professionals Kenya, vetted freelancers Kenya, local freelancers Nairobi, affordable freelancers Kenya, top talent Kenya, where to hire freelancers Kenya, best freelancers Nairobi, hire remote workers Kenya, Kenya based freelancers, skilled workers Kenya, hire on M-Pesa Kenya, post a job Kenya, find talent Kenya, outsource work Kenya"
+        canonical="/talent"
+      />
       <StyleInjector />
       <div style={{ paddingTop:64, minHeight:'100vh', background:'var(--cream)' }}>
 
@@ -488,7 +547,14 @@ export default function Talent() {
               </button>
             )}
             <p className="filter-bar-count" style={{ marginLeft:'auto', fontSize:13, color:'var(--grey-500)', whiteSpace:'nowrap' }}>
-              {loading ? 'Loading…' : <><strong style={{ color:'var(--ink)' }}>{filtered.length}</strong> found</>}
+              {loading ? 'Loading…' : (
+                <>
+                  <strong style={{ color:'var(--ink)' }}>{filtered.length}</strong>
+                  {' of '}
+                  <strong style={{ color:'var(--ink)' }}>{totalCount ?? talents.length}</strong>
+                  {' profiles'}
+                </>
+              )}
             </p>
           </div>
 

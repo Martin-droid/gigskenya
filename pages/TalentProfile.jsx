@@ -11,6 +11,7 @@ import {
   incrementProfileContact, reportListing,
   submitRating, getMyRating,
 } from '../lib/firestore';
+import SEO from '../components/SEO';
 import { requireAuth } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
 
@@ -96,7 +97,7 @@ const CSS = `
     .tp-card-pad    { padding: 16px !important; }
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: 720px) {
     .tp-layout               { grid-template-columns: 1fr !important; }
     .tp-sidebar              { position:static !important; }
     .tp-sidebar-desktop-only { display:none !important; }
@@ -108,7 +109,11 @@ const CSS = `
     .tp-hero-rate-pill       { display:flex !important; }
     .tp-mobile-actions-row   { display:flex !important; }
   }
-  @media (min-width: 821px) {
+  @media (max-width: 480px) {
+    .tp-card-pad { padding: 16px !important; }
+    .tp-btn      { min-height: 44px; }
+  }
+  @media (min-width: 721px) {
     .tp-mobile-cta          { display:none !important; }
     .tp-mobile-contact-slot { display:none !important; }
     .tp-hero-rate-pill      { display:none !important; }
@@ -365,6 +370,13 @@ export default function TalentProfile() {
     setRatingSubmitting(true);
     try {
       await submitRating(id, user.uid, selStar, ratingComment);
+      const prevScore = myRating?.score || 0;
+      const isNew     = !myRating;
+      setTalent(prev => ({
+        ...prev,
+        ratingSum:   (prev.ratingSum   || 0) + (isNew ? selStar : selStar - prevScore),
+        ratingCount: (prev.ratingCount || 0) + (isNew ? 1 : 0),
+      }));
       setMyRating({ score: selStar, comment: ratingComment });
       setRatingDone(true);
       setToast('Rating submitted — thank you!');
@@ -437,8 +449,44 @@ export default function TalentProfile() {
     </div>
   );
 
+  const profileDesc = talent.bio
+    ? `${talent.bio.slice(0, 140)}… Hire ${talent.posterName?.split(' ')[0] || 'them'} on GigsKenya.`
+    : `${talent.posterName || 'Freelancer'} — ${talent.title || 'Kenyan professional'} available for hire on GigsKenya.`;
+
+  const profileJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: talent.posterName || 'Freelancer',
+    jobTitle: talent.title || '',
+    description: talent.bio || '',
+    url: `https://gigskenya.co.ke/talent/${id}`,
+    address: { '@type': 'PostalAddress', addressLocality: talent.location || 'Kenya', addressCountry: 'KE' },
+    ...(talent.photoURL ? { image: talent.photoURL } : {}),
+    ...(talent.portfolioUrl ? { url: talent.portfolioUrl } : {}),
+  };
+
   return (
     <>
+      <SEO
+        title={`${talent.posterName || 'Freelancer'} — ${talent.title || 'Kenyan Freelancer'} in ${talent.location || 'Kenya'}`}
+        description={profileDesc}
+        keywords={[
+          `hire ${(talent.title||'').toLowerCase()} Kenya`,
+          `${(talent.title||'').toLowerCase()} for hire Nairobi`,
+          `${(talent.category||'').toLowerCase()} Kenya`,
+          `freelancers ${talent.location||'Nairobi'}`,
+          `hire freelancer ${talent.location||'Kenya'}`,
+          ...(talent.skills||[]).slice(0,6),
+          'hire freelancers Kenya',
+          'Kenyan professionals for hire',
+          'freelance marketplace Kenya',
+          'M-Pesa freelance Kenya',
+        ].filter(Boolean).join(', ')}
+        canonical={`/talent/${id}`}
+        ogType="profile"
+        ogImage={talent.photoURL || undefined}
+        jsonLd={profileJsonLd}
+      />
       <StyleTag/>
       {/* FIX 4: overflow-x hidden on the page root stops any stray element from causing a horizontal scrollbar */}
       <div className="tp-root" style={{ paddingTop:64, minHeight:'100vh', background:'#F8F6F1', overflowX:'hidden' }}>

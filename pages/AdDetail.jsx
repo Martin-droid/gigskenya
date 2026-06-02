@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import SEO from '../components/SEO';
 import {
   MapPin, Phone, MessageSquare, ArrowLeft, Eye, Clock, Flag,
   Share2, Shield, ChevronRight, Copy, Check, X, Link as LinkIcon,
@@ -307,7 +308,42 @@ export default function AdDetail() {
     </div>
   );
 
+  const adTitle    = ad?.title    || '';
+  const adLocation = ad?.location || 'Kenya';
+  const adCategory = ad?.category || '';
+  const adDesc     = ad?.description ? ad.description.slice(0, 155) : `${adTitle} opportunity in ${adLocation}. Apply on GigsKenya — Kenya's top freelance & jobs marketplace.`;
+  const adJsonLd   = ad ? {
+    '@context': 'https://schema.org',
+    '@type': isJob ? 'JobPosting' : 'Service',
+    title: adTitle,
+    description: ad.description || adTitle,
+    datePosted: ad.createdAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
+    hiringOrganization: { '@type': 'Organization', name: ad.posterName || 'GigsKenya Hirer' },
+    jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: adLocation, addressCountry: 'KE' } },
+    ...(ad.rate ? { baseSalary: { '@type': 'MonetaryAmount', currency: ad.currency || 'KES', value: { '@type': 'QuantitativeValue', value: ad.rate } } } : {}),
+  } : null;
+
   return (
+    <>
+    <SEO
+      title={`${adTitle}${adCategory ? ` | ${adCategory}` : ''} in ${adLocation} — ${isJob ? 'Job' : 'Service'} | GigsKenya`}
+      description={adDesc}
+      keywords={[
+        adTitle.toLowerCase(),
+        `${isJob ? 'jobs' : 'hire'} in Kenya`,
+        `${adCategory.toLowerCase()} ${isJob ? 'jobs' : 'freelancers'} Kenya`,
+        `${adLocation.toLowerCase()} ${isJob ? 'jobs' : 'freelancers'}`,
+        'jobs in Kenya 2026',
+        'kazi Kenya',
+        'latest jobs Kenya',
+        isJob ? 'job vacancies Kenya' : 'hire freelancers Kenya',
+        'M-Pesa Kenya',
+        'online jobs Kenya',
+      ].filter(Boolean).join(', ')}
+      canonical={`/ad/${id}`}
+      ogType={isJob ? 'article' : 'website'}
+      jsonLd={adJsonLd}
+    />
     <div style={{ paddingTop: 64, minHeight: '100vh', background: '#F8FAFC' }}>
       <div style={{ maxWidth: 1040, margin: '0 auto', padding: '28px 16px 80px' }} className="ad-page-inner">
 
@@ -494,5 +530,6 @@ export default function AdDetail() {
         }
       `}</style>
     </div>
+    </>
   );
 }

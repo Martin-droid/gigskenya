@@ -103,7 +103,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <button className="mob-btn" onClick={()=>setMob(!mob)} style={{ display:'none', background:'none', border:'none', color:'var(--ink)' }}>
+        <button className="mob-btn" onClick={()=>setMob(!mob)} style={{ display:'none', background:'none', border:'none', color:'var(--ink)', minWidth:44, minHeight:44, alignItems:'center', justifyContent:'center', cursor:'pointer', borderRadius:8 }}>
           {mob ? <X size={22}/> : <Menu size={22}/>}
         </button>
       </div>
