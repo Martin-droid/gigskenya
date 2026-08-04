@@ -32,7 +32,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Nav links — only real pages */}
+          {/* Nav links */}
           <div>
             <h4 style={{
               fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
@@ -41,10 +41,11 @@ export default function Footer() {
             }}>Explore</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
               {[
-                { to: '/browse',  label: 'Browse Listings' },
-                { to: '/talent',  label: 'Find Talent'     },
-                { to: '/post-ad', label: 'Post a Gig Ad'   },
+                { to: '/browse',               label: 'Browse Listings'   },
+                { to: '/talent',               label: 'Find Talent'       },
+                { to: '/how-it-works',         label: 'How It Works'      },
                 { to: '/register?role=talent', label: 'Join as Freelancer' },
+                { to: '/register?role=hirer',  label: 'Post a Job'        },
               ].map(({ to, label }) => (
                 <Link
                   key={to} to={to}
@@ -53,6 +54,41 @@ export default function Footer() {
                   onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,.55)'}
                 >{label}</Link>
               ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 style={{
+              fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
+              letterSpacing: '.1em', textTransform: 'uppercase',
+              color: 'var(--green)', marginBottom: 16,
+            }}>Contact</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+              <a
+                href="mailto:info@gigs254.com"
+                style={{ color: 'rgba(255,255,255,.55)', fontSize: 14, textDecoration: 'none', transition: 'color .15s' }}
+                onMouseOver={e => e.currentTarget.style.color = 'white'}
+                onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,.55)'}
+              >
+                info@gigs254.com
+              </a>
+              <p style={{ color: 'rgba(255,255,255,.28)', fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+                Nairobi, Kenya
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+                {[
+                  { to: '/terms',   label: 'Terms & Conditions' },
+                  { to: '/privacy', label: 'Privacy Policy'     },
+                ].map(({ to, label }) => (
+                  <Link
+                    key={to} to={to}
+                    style={{ color: 'rgba(255,255,255,.38)', fontSize: 13, textDecoration: 'none', transition: 'color .15s' }}
+                    onMouseOver={e => e.currentTarget.style.color = 'rgba(255,255,255,.7)'}
+                    onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,.38)'}
+                  >{label}</Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>
