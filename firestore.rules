@@ -3,7 +3,25 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── Helpers ───────────────────────────────────────────────────
-    function isAuth()     { return request.auth != null; }
+    // Banned accounts: denied on every authenticated read/write path.
+    // Also disable the account in Firebase Console → Authentication.
+    function bannedUids() {
+      return [
+        'ai3LiwfN3XTo0uKPDBJa9Chqoj93'  // "Scl company" — tinder-account / KYC fraud spam, banned 2026-07-21
+      ];
+    }
+    // Matched against the signed-in account's email, so re-registering
+    // with the same email under a new uid is blocked too.
+    function bannedEmails() {
+      return [
+        'simokkish@gmail.com'  // "Scl company"
+      ];
+    }
+    function isAuth() {
+      return request.auth != null
+        && !(request.auth.uid in bannedUids())
+        && !(request.auth.token.get('email', '').lower() in bannedEmails());
+    }
     function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
 
     // Reads the caller's role from their user document (1 extra read on writes).
