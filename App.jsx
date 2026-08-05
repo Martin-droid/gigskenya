@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Browse from './pages/Browse';
+import ExternalJobs from './pages/ExternalJobs';
 import AdDetail from './pages/AdDetail';
 import Talent from './pages/Talent';
 import TalentProfile from './pages/TalentProfile';
@@ -37,6 +38,7 @@ function AppRoutes() {
       <Route path="/login"        element={<Login    key={loc.search} />} />
       <Route path="/register"     element={<Register key={loc.search} />} />
       <Route path="/browse"       element={<Browse />} />
+      <Route path="/international-jobs" element={<ExternalJobs />} />
       <Route path="/ad/:id"       element={<AdDetail />} />
       <Route path="/talent"       element={<Talent />} />
       <Route path="/talent/:id"   element={<TalentProfile />} />
