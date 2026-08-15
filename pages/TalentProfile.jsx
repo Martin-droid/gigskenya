@@ -459,10 +459,10 @@ export default function TalentProfile() {
     name: talent.posterName || 'Freelancer',
     jobTitle: talent.title || '',
     description: talent.bio || '',
-    url: `https://gigskenya.co.ke/talent/${id}`,
+    url: `https://gigs254.com/talent/${id}`,
     address: { '@type': 'PostalAddress', addressLocality: talent.location || 'Kenya', addressCountry: 'KE' },
     ...(talent.photoURL ? { image: talent.photoURL } : {}),
-    ...(talent.portfolioUrl ? { url: talent.portfolioUrl } : {}),
+    ...(talent.portfolioUrl ? { sameAs: [talent.portfolioUrl] } : {}),
   };
 
   return (

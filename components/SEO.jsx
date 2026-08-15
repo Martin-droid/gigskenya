@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE      = 'GigsKenya';
-const SITE_URL  = 'https://gigskenya.co.ke';
+const SITE_URL  = 'https://gigs254.com';
 const OG_IMAGE  = `${SITE_URL}/og-image.jpg`;
 const TWITTER   = '@GigsKenya';
 const YEAR      = new Date().getFullYear();

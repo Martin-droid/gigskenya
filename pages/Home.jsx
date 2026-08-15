@@ -471,8 +471,8 @@ export default function Home() {
     '@type': 'WebPage',
     name: 'GigsKenya — Jobs in Kenya & Freelance Marketplace',
     description: 'Find jobs in Kenya or hire top Kenyan freelancers. Tech, design, writing, marketing, photography & more. Nairobi, Mombasa, Kisumu & remote.',
-    url: 'https://gigskenya.co.ke',
-    breadcrumb: { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://gigskenya.co.ke' }] },
+    url: 'https://gigs254.com',
+    breadcrumb: { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://gigs254.com' }] },
   };
 
   return (
