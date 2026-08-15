@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
   Search, ChevronDown, X, Plus, SlidersHorizontal,
   MapPin, Phone, MessageSquare, Briefcase, Zap, Star,
@@ -615,6 +615,10 @@ export default function Browse() {
           <p style={{ fontSize: 12.5, color: '#9CA3AF', marginBottom: 16 }}>
             Showing <strong style={{ color: '#111827' }}>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)}</strong> of{' '}
             <strong style={{ color: '#111827' }}>{filtered.length}</strong> listing{filtered.length !== 1 ? 's' : ''}
+            {' · '}
+            <Link to="/talent" style={{ color: 'var(--green)', fontWeight: 700, textDecoration: 'none' }}>
+              Hiring instead? Browse Kenyan freelancers →
+            </Link>
           </p>
         )}
 

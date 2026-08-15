@@ -198,7 +198,7 @@ export default function HowItWorks() {
             ))}
           </div>
 
-          <div style={{ marginTop: 64, display: 'flex', justifyContent: 'center' }}>
+          <div style={{ marginTop: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
             <button
               onClick={() => navigate(tab === 'hirer' ? '/dashboard' : '/register')}
               className="btn-primary"
@@ -206,6 +206,14 @@ export default function HowItWorks() {
             >
               {tab === 'hirer' ? 'Post a Job Ad Free' : 'Create Your Profile'} <ArrowRight size={18} />
             </button>
+            {tab === 'hirer' && (
+              <button
+                onClick={() => navigate('/talent')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--green)', fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-body)' }}
+              >
+                Or browse Kenyan freelancers directly →
+              </button>
+            )}
           </div>
         </div>
       </section>

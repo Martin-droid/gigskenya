@@ -42,7 +42,7 @@ export default function Footer() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
               {[
                 { to: '/browse',               label: 'Browse Listings'   },
-                { to: '/talent',               label: 'Find Talent'       },
+                { to: '/talent',               label: 'Hire Freelancers'  },
                 { to: '/how-it-works',         label: 'How It Works'      },
                 { to: '/register?role=talent', label: 'Join as Freelancer' },
                 { to: '/register?role=hirer',  label: 'Post a Job'        },
