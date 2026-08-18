@@ -262,7 +262,7 @@ export default function AdDetail() {
   const isJob       = ad.type === 'job';
   const postedDate  = ad.createdAt?.toDate ? ad.createdAt.toDate().toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const isOwnAd     = isAuthenticated && user?.uid === (ad.userId || ad.uid);
-  const posterPhoto = hirerProfile?.photoURL || hirerProfile?.googlePhotoURL || ad.posterPhoto || null;
+  const posterPhoto = ad.posterLogo || hirerProfile?.companyLogoURL || hirerProfile?.photoURL || hirerProfile?.googlePhotoURL || ad.posterPhoto || null;
   const tags        = Array.isArray(ad.tags) ? ad.tags : (ad.tags || '').split(',').map(t => t.trim()).filter(Boolean);
 
   const ActionButtons = ({ stack = true }) => (
