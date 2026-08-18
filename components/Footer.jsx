@@ -45,7 +45,7 @@ export default function Footer() {
                 { to: '/talent',               label: 'Hire Freelancers'  },
                 { to: '/how-it-works',         label: 'How It Works'      },
                 { to: '/register?role=talent', label: 'Join as Freelancer' },
-                { to: '/register?role=hirer',  label: 'Post a Job'        },
+                { to: '/post-a-job',           label: 'Post a Job'        },
               ].map(({ to, label }) => (
                 <Link
                   key={to} to={to}

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -11,6 +11,7 @@ import AdDetail from './pages/AdDetail';
 import Talent from './pages/Talent';
 import TalentProfile from './pages/TalentProfile';
 import HowItWorks from './pages/HowItWorks';
+import PostJob from './pages/PostJob';
 import Dashboard from './pages/Dashboard';
 import Messages from './pages/Messages';
 import Analytics from './pages/Analytics';
@@ -41,6 +42,8 @@ function AppRoutes() {
       <Route path="/talent"       element={<Talent />} />
       <Route path="/talent/:id"   element={<TalentProfile />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
+      <Route path="/post-a-job"   element={<PostJob />} />
+      <Route path="/post-ad"      element={<Navigate to="/post-a-job" replace />} />
       <Route path="/dashboard"    element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/messages"     element={<ProtectedRoute><Messages /></ProtectedRoute>} />
       <Route path="/analytics"    element={<Analytics />} />
