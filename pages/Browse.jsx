@@ -457,23 +457,16 @@ export default function Browse() {
   }, [page, totalPages]);
 
   const catLabel  = CATS.find(c => c.id === cat)?.label || '';
-  const typeLabel = type === 'job' ? 'Jobs' : type === 'service' ? 'Freelancers' : 'Listings';
-  const headingText = cat !== 'all'
-    ? `${catLabel} ${typeLabel} in Kenya`
-    : type !== 'all' ? `${typeLabel} in Kenya` : 'All Freelancers & Jobs in Kenya';
+  const headingText = cat !== 'all' ? `${catLabel} Jobs in Kenya` : 'All Jobs in Kenya';
 
   const yr = new Date().getFullYear();
   const browseTitle = cat !== 'all'
-    ? `${catLabel} Jobs & Freelancers in Kenya ${yr}`
-    : type === 'job'     ? `Latest Jobs in Kenya ${yr} | Vacancies, Part Time & Remote Work`
-    : type === 'service' ? `Hire Freelancers in Kenya ${yr} | Browse Top Kenyan Talent`
-    : `Jobs & Freelancers in Kenya ${yr} | Kazi Kenya, Online Work & Hire`;
+    ? `${catLabel} Jobs in Kenya ${yr}`
+    : `Latest Jobs in Kenya ${yr} | Vacancies, Part Time & Remote Work`;
 
   const browseDesc = cat !== 'all'
-    ? `Browse ${catLabel.toLowerCase()} jobs and freelancers in Kenya. Find and hire top ${catLabel.toLowerCase()} professionals in Nairobi, Mombasa, Kisumu & remote. Direct contact, pay via M-Pesa.`
-    : type === 'job'
-      ? `Latest job vacancies in Kenya ${yr}. Full time, part time, remote & freelance jobs in Nairobi, Mombasa, Kisumu, Nakuru & across Kenya. Online jobs that pay via M-Pesa. Fresh graduate & entry level jobs included.`
-      : `Hire top Kenyan freelancers across tech, design, writing, marketing, photography, accounting & more. Browse talent in Nairobi, Mombasa, Kisumu & remote. Direct contact, no commission, pay via M-Pesa.`;
+    ? `Browse ${catLabel.toLowerCase()} jobs in Kenya. Find opportunities in Nairobi, Mombasa, Kisumu & remote. Apply directly, pay via M-Pesa.`
+    : `Latest job vacancies in Kenya ${yr}. Full time, part time, remote & freelance jobs in Nairobi, Mombasa, Kisumu, Nakuru & across Kenya. Online jobs that pay via M-Pesa. Fresh graduate & entry level jobs included.`;
 
   return (
     <>
@@ -498,7 +491,7 @@ export default function Browse() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(14px,2.2vw,18px)', fontWeight: 800, color: 'white', letterSpacing: '-.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {cat !== 'all' ? headingText : type === 'job' ? 'Job Ads' : type === 'service' ? 'Freelance Services' : 'All Listings'}
+                {cat !== 'all' ? headingText : type === 'job' ? 'Job Ads' : 'All Listings'}
               </span>
               {!loading && (
                 <span style={{ fontSize: 12, color: 'rgba(255,255,255,.3)', fontFamily: 'var(--font-body)', flexShrink: 0 }}>
@@ -516,7 +509,7 @@ export default function Browse() {
             <div style={{ flex: 1, minWidth: 0, background: 'white', borderRadius: 12, display: 'flex', alignItems: 'center', overflow: 'hidden', height: 46 }}>
               {/* Type tabs */}
               <div style={{ display: 'flex', gap: 2, background: '#F3F4F6', padding: 3, margin: '0 4px', borderRadius: 9, flexShrink: 0 }}>
-                {[{ id: 'all', l: 'All' }, { id: 'service', l: 'Services' }, { id: 'job', l: 'Jobs' }].map(({ id, l }) => (
+                {[{ id: 'all', l: 'All' }, { id: 'job', l: 'Jobs' }].map(({ id, l }) => (
                   <button key={id} onClick={() => setType(id)} style={{ padding: '5px 9px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-display)', transition: 'all .12s', background: type === id ? 'white' : 'transparent', color: type === id ? '#111827' : '#9CA3AF', boxShadow: type === id ? '0 1px 3px rgba(0,0,0,.1)' : 'none', whiteSpace: 'nowrap' }}>{l}</button>
                 ))}
               </div>
@@ -599,7 +592,7 @@ export default function Browse() {
         {!loading && hasActive && (
           <div style={{ display: 'flex', gap: 7, alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
             {q               && <FilterPill label={`"${q}"`}                                    onRemove={() => { setQ(''); setDraftQ(''); }} />}
-            {type !== 'all'  && <FilterPill label={type === 'service' ? 'Services' : 'Jobs'}    onRemove={() => setType('all')} />}
+            {type !== 'all'  && <FilterPill label="Jobs" onRemove={() => setType('all')} />}
             {cat  !== 'all'  && <FilterPill label={CATS.find(c => c.id === cat)?.label}         onRemove={() => setCat('all')} />}
             {loc  !== 'All Kenya' && <FilterPill label={loc}                                    onRemove={() => setLoc('All Kenya')} />}
             <button onClick={clearAll} style={{ fontSize: 12, color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', textDecoration: 'underline' }}>
@@ -632,7 +625,7 @@ export default function Browse() {
                 <div style={{ fontSize: 52, marginBottom: 16 }}>🇰🇪</div>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, marginBottom: 10, color: '#111827' }}>Be the first to post!</h2>
                 <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 24, maxWidth: 340, margin: '0 auto 24px', lineHeight: 1.7 }}>
-                  GigsKenya just launched. Post your service or job ad and be the first listing Kenyans see — completely free.
+                  GigsKenya just launched. Post your job ad and be the first listing Kenyans see — completely free.
                 </p>
                 <Link to="/post-a-job" onClick={postJobClick} className="gk-btn-primary" style={{ padding: '12px 28px', fontSize: 14, margin: '0 auto' }}>
                   Post a Free Ad →
@@ -687,15 +680,15 @@ export default function Browse() {
           <div style={{ marginTop: 52, padding: '24px 26px', background: 'white', borderRadius: 16, border: '1.5px solid #E5E7EB' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 800, marginBottom: 8, letterSpacing: '-.02em', color: '#111827' }}>
               {cat !== 'all'
-                ? `Hire ${catLabel} Professionals in Kenya`
-                : 'Find Kenyan Freelancers & Post Jobs on GigsKenya'
+                ? `${catLabel} Jobs in Kenya`
+                : 'Find Job Vacancies in Kenya on GigsKenya'
               }
             </h2>
             <p style={{ fontSize: 13.5, color: '#6B7280', lineHeight: 1.8, maxWidth: 720 }}>
-              GigsKenya connects Kenyan businesses with skilled freelancers across Nairobi, Mombasa, Kisumu, Eldoret, and beyond.
+              GigsKenya connects Kenyan job seekers with employers across Nairobi, Mombasa, Kisumu, Eldoret, and beyond.
               {cat !== 'all'
-                ? ` Browse ${catLabel} professionals and contact them directly via phone or WhatsApp — no middleman.`
-                : ' Browse tech, design, writing, marketing, and more — or post a job ad and receive direct enquiries from qualified Kenyan professionals.'
+                ? ` Browse ${catLabel} vacancies and apply directly via phone or WhatsApp — no middleman.`
+                : ' Browse the latest job ads, or post your own vacancy and receive direct applications from qualified Kenyan candidates.'
               }
             </p>
           </div>

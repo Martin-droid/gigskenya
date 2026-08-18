@@ -473,7 +473,9 @@ export default function Home() {
     }).catch(()=>{}).finally(()=>setLoadingTalent(false));
   }, []);
 
-  const search = () => navigate(`/browse?q=${encodeURIComponent(q)}&type=${tab}`);
+  const search = () => tab === 'service'
+    ? navigate(`/talent?q=${encodeURIComponent(q)}`)
+    : navigate(`/browse?q=${encodeURIComponent(q)}&type=${tab}`);
 
   const POPULAR = ['Android Developer','Logo Design Nairobi','M-Pesa Integration','Social Media Manager','Video Editing','Accountant Nairobi','SEO Kenya'];
   const activeTalent = featuredTalent[heroIdx];
@@ -651,7 +653,7 @@ export default function Home() {
             <EmptyState
               icon={Zap}
               title="Be the first to post a listing"
-              subtitle="GigsKenya is live and growing. Post your service or job and reach Kenyan professionals."
+              subtitle="GigsKenya is live and growing. Post a job and reach Kenyan professionals."
               ctaLabel="Post a Listing →"
               onCta={()=>navigate('/register?role=hirer')}
             />

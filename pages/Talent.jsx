@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, MapPin, Phone, MessageSquare, ChevronDown, X, Link as LinkIcon, FileDown, SlidersHorizontal, ArrowRight, Zap, Lock } from 'lucide-react';
 import { getTalents, getTalentsCount } from '../lib/firestore';
 import { useAuth } from '../context/AuthContext';
@@ -404,10 +404,11 @@ export function TalentCard({ talent, navigate, variant = 'default' }) {
 
 /* ─── Main Talent Page ─── */
 export default function Talent() {
+  const [sp] = useSearchParams();
   const [talents, setTalents]     = useState([]);
   const [loading, setLoading]     = useState(true);
   const [totalCount, setTotalCount] = useState(null);
-  const [q, setQ]                 = useState('');
+  const [q, setQ]                 = useState(() => sp.get('q') || '');
   const [loc, setLoc]             = useState('All Kenya');
   const [cat, setCat]             = useState('All');
   const [exp, setExp]             = useState('Any Level');
