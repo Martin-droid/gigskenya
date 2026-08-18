@@ -10,7 +10,7 @@ import {
 import { getAds, getTalents } from '../lib/firestore';
 import { TalentCard } from './Talent';
 import { useAuth } from '../context/AuthContext';
-import { hashIndex } from '../lib/colors';
+import { hashIndex, avatarColor } from '../lib/colors';
 import { timeAgo } from '../lib/time';
 import './Home.css';
 
@@ -261,7 +261,7 @@ function HeroProfileStrip({ talents, navigate, idx, setIdx, setPaused }) {
 export function AdCard({ ad, navigate }) {
   const [hov, setHov] = useState(false);
   const isJob = ad.type === 'job';
-  const color = getColor(ad.id);
+  const color = avatarColor(ad.id);
   const initials = (ad.posterName||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const tags = ad.tags
     ? (Array.isArray(ad.tags) ? ad.tags : ad.tags.split(',').map(t=>t.trim()).filter(Boolean))
