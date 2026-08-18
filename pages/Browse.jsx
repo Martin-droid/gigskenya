@@ -8,6 +8,7 @@ import { getAds } from '../lib/firestore';
 import { requireAuth, goToPostJob } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
 import { CATEGORIES } from '../lib/categories';
+import { CITIES } from '../lib/locations';
 import './Home.css';
 import SEO from '../components/SEO';
 
@@ -16,7 +17,7 @@ import SEO from '../components/SEO';
 ───────────────────────────────────────────────────────────── */
 const PAGE_SIZE = 12;
 
-const LOCS = ['All Kenya', 'Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Nakuru', 'Thika', 'Remote'];
+const LOCS = ['All Kenya', ...CITIES];
 
 // id === label === the exact string PostAdForm saves as ad.category —
 // keeps filtering an exact match instead of a fragile prefix guess.

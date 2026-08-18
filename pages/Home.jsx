@@ -259,6 +259,7 @@ function HeroProfileStrip({ talents, navigate, idx, setIdx, setPaused }) {
 export function AdCard({ ad, navigate }) {
   const [hov, setHov] = useState(false);
   const isJob = ad.type === 'job';
+  const color = getColor(ad.id);
   const initials = (ad.posterName||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const tags = ad.tags
     ? (Array.isArray(ad.tags) ? ad.tags : ad.tags.split(',').map(t=>t.trim()).filter(Boolean))
@@ -275,21 +276,32 @@ export function AdCard({ ad, navigate }) {
       className="gk-ad-card"
       style={{
         transform: hov ? 'translateY(-4px)' : 'none',
-        boxShadow: hov ? '0 20px 48px rgba(0,0,0,.1)' : '0 1px 4px rgba(0,0,0,.06)',
-        borderColor: hov ? '#D1D5DB' : '#E5E7EB',
+        boxShadow: hov ? `0 20px 48px ${color}1e, 0 4px 14px rgba(0,0,0,.06)` : '0 1px 4px rgba(0,0,0,.06)',
+        borderColor: hov ? color+'55' : '#E5E7EB',
+        overflow: 'hidden',
       }}
     >
-      <div style={{ padding:'20px' }}>
+      {/* Top accent stripe */}
+      <div style={{
+        height: 3,
+        background: ad.boosted ? 'linear-gradient(90deg,#00A550,#00C060)' : `linear-gradient(90deg, ${color}, ${color}88)`,
+      }} />
+
+      <div style={{ padding:'18px 20px 20px' }}>
 
         {/* Header */}
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
           <div style={{
-            width:40, height:40, borderRadius:12, flexShrink:0,
-            background:'linear-gradient(145deg,#1E293B,#334155)',
+            width:40, height:40, borderRadius:12, flexShrink:0, overflow:'hidden',
+            background: ad.posterLogo ? 'white' : 'linear-gradient(145deg,#1E293B,#334155)',
+            border: ad.posterLogo ? '1px solid #E5E7EB' : 'none',
             display:'flex', alignItems:'center', justifyContent:'center',
             fontSize:13, fontWeight:800, color:'white', letterSpacing:'.01em',
           }}>
-            {initials}
+            {ad.posterLogo
+              ? <img src={ad.posterLogo} alt="" style={{ width:'100%', height:'100%', objectFit:'contain', padding:4 }} />
+              : initials
+            }
           </div>
           <div style={{ flex:1, minWidth:0 }}>
             <p style={{ fontSize:13, fontWeight:600, color:'#111827', lineHeight:1.2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>

@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { createAd } from '../lib/firestore';
 import { CATEGORIES as CATS } from '../lib/categories';
-const CITIES = [
-  'Nairobi','Mombasa','Kisumu','Nakuru','Eldoret',
-  'Thika','Remote / Online','Other',
-];
+import { CITIES } from '../lib/locations';
 const DURATIONS = [
   'Less than 1 week',
   '1–2 weeks',
