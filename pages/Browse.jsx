@@ -2,13 +2,15 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
   Search, ChevronDown, X, Plus, SlidersHorizontal,
-  MapPin, Phone, MessageSquare, Briefcase, Zap, Star,
+  MapPin, Phone, MessageSquare, Star,
 } from 'lucide-react';
 import { getAds } from '../lib/firestore';
 import { requireAuth, goToPostJob } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
 import { CATEGORIES } from '../lib/categories';
 import { CITIES } from '../lib/locations';
+import { avatarColor } from '../lib/colors';
+import { timeAgo } from '../lib/time';
 import './Home.css';
 import SEO from '../components/SEO';
 
@@ -26,8 +28,6 @@ const CATS = [
   ...CATEGORIES.map(c => ({ id: c, label: c })),
 ];
 
-const AVATAR_COLORS = ['#4F46E5', '#EC4899', '#F59E0B', '#10B981', '#EF4444', '#8B5CF6', '#06B6D4', '#F97316'];
-const avatarColor  = (id) => AVATAR_COLORS[parseInt(id?.slice(-2) || '0', 16) % AVATAR_COLORS.length];
 const getInitials  = (name) => (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 
 /* ─────────────────────────────────────────────────────────────
@@ -146,9 +146,9 @@ export function AdCard({ ad, navigate }) {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const color = avatarColor(ad.id);
-  const isJob = ad.type === 'job';
   const inits = getInitials(ad.posterName);
   const rateDisplay = formatRate(ad);
+  const posted = timeAgo(ad.createdAt);
   const tags = Array.isArray(ad.tags)
     ? ad.tags
     : (ad.tags || '').split(',').map(t => t.trim()).filter(Boolean);
@@ -198,27 +198,19 @@ export function AdCard({ ad, navigate }) {
 
       <div style={{ padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-        {/* Row 1: type + featured + location */}
+        {/* Row 1: featured + posted time + location */}
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 10 }}>
-          <span style={{
-            fontSize: 10, fontWeight: 700, padding: '2px 9px',
-            borderRadius: 20, letterSpacing: '.05em',
-            background: isJob ? '#FEF3C7' : `${color}14`,
-            color: isJob ? '#D97706' : color,
-          }}>
-            {isJob ? <><Briefcase size={9}/> Job</> : <><Zap size={9}/> Service</>}
-          </span>
           {ad.boosted && (
             <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706', background: '#FEF3C7', padding: '2px 8px', borderRadius: 20, whiteSpace: 'nowrap' }}>
               <Star size={9} fill="currentColor"/> Featured
             </span>
           )}
           <span style={{ flex: 1 }} />
-          {ad.location && (
-            <span style={{ fontSize: 11, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 2 }}>
-              <MapPin size={9} strokeWidth={2.5} /> {ad.location}
-            </span>
-          )}
+          <span style={{ fontSize: 11, color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap', minWidth: 0 }}>
+            {posted && <span>{posted}</span>}
+            {posted && ad.location && <span style={{ color: '#E5E7EB' }}>·</span>}
+            {ad.location && <span style={{ display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}><MapPin size={9} strokeWidth={2.5} /> {ad.location}</span>}
+          </span>
         </div>
 
         {/* Category chip */}

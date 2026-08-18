@@ -10,6 +10,8 @@ import {
 import { getAds, getTalents } from '../lib/firestore';
 import { TalentCard } from './Talent';
 import { useAuth } from '../context/AuthContext';
+import { hashIndex } from '../lib/colors';
+import { timeAgo } from '../lib/time';
 import './Home.css';
 
 /* ── Categories ─────────────────────────────────────────── */
@@ -47,7 +49,7 @@ const browseTrending = (navigate, label) => {
 
 /* Avatar colours — no blue/indigo */
 const AVATAR_PALETTE = ['#00875A','#0D9488','#D97706','#DC2626','#7C3AED','#EA580C','#0891B2','#059669'];
-const getColor = (id) => AVATAR_PALETTE[parseInt(id?.slice(-2)||'0',16) % AVATAR_PALETTE.length];
+const getColor = (id) => AVATAR_PALETTE[hashIndex(id, AVATAR_PALETTE.length)];
 const getInitials = (name) => (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 /* ── Hero qualification: active + at least a headline/bio + phone ── */
 const heroQualifies = (t) =>
@@ -265,6 +267,7 @@ export function AdCard({ ad, navigate }) {
     ? (Array.isArray(ad.tags) ? ad.tags : ad.tags.split(',').map(t=>t.trim()).filter(Boolean))
     : [];
   const rate = ad.rate || ad.budget;
+  const posted = timeAgo(ad.createdAt);
 
   return (
     <div
@@ -313,17 +316,11 @@ export function AdCard({ ad, navigate }) {
               </p>
             )}
           </div>
-          <div style={{ display:'flex', gap:5, flexShrink:0 }}>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4, flexShrink:0 }}>
             {ad.boosted && (
               <span style={{ fontSize:9.5, fontWeight:800, padding:'2px 7px', borderRadius:6, background:'#00A550', color:'white', letterSpacing:'.04em' }}>FEATURED</span>
             )}
-            <span style={{
-              fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:8,
-              background: isJob ? '#FEF3C7' : '#F3F4F6',
-              color: isJob ? '#92400E' : '#4B5563',
-            }}>
-              {isJob ? 'Job' : 'Service'}
-            </span>
+            {posted && <span style={{ fontSize:10.5, color:'#9CA3AF', whiteSpace:'nowrap' }}>{posted}</span>}
           </div>
         </div>
 

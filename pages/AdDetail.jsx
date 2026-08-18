@@ -9,8 +9,7 @@ import {
 import { getAd, incrementAdViews, incrementAdContact, reportListing, getHirerProfile } from '../lib/firestore';
 import { requireAuth, saveIntent } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
-
-const avatarColors = ['#4F46E5','#EC4899','#F59E0B','#10B981','#EF4444','#8B5CF6','#06B6D4','#F97316'];
+import { avatarColor } from '../lib/colors';
 
 function Avatar({ src, name, color, size = 48 }) {
   const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -258,7 +257,7 @@ export default function AdDetail() {
     </div>
   );
 
-  const color       = avatarColors[parseInt(id?.slice(-2) || '0', 16) % avatarColors.length];
+  const color       = avatarColor(id);
   const isJob       = ad.type === 'job';
   const postedDate  = ad.createdAt?.toDate ? ad.createdAt.toDate().toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   const isOwnAd     = isAuthenticated && user?.uid === (ad.userId || ad.uid);
