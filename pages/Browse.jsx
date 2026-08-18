@@ -9,7 +9,7 @@ import { requireAuth, goToPostJob } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
 import { CATEGORIES } from '../lib/categories';
 import { CITIES } from '../lib/locations';
-import { avatarColor } from '../lib/colors';
+import { avatarColor, darkGradient, GOLD_GRADIENT, DARK_TILE } from '../lib/colors';
 import { timeAgo } from '../lib/time';
 import './Home.css';
 import SEO from '../components/SEO';
@@ -190,9 +190,7 @@ export function AdCard({ ad, navigate }) {
       <div style={{
         height: 4,
         borderRadius: '14px 14px 0 0',
-        background: ad.boosted
-          ? 'linear-gradient(90deg, #00A550, #00C060)'
-          : `linear-gradient(90deg, ${color}, ${color}88)`,
+        background: ad.boosted ? GOLD_GRADIENT : darkGradient(color),
         flexShrink: 0,
       }} />
 
@@ -272,10 +270,10 @@ export function AdCard({ ad, navigate }) {
           <div style={{ display: 'flex', gap: 9, alignItems: 'center', minWidth: 0 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-              background: ad.posterLogo ? 'white' : `${color}14`,
+              background: ad.posterLogo ? 'white' : DARK_TILE,
               border: ad.posterLogo ? '1px solid #F0F2F5' : 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 900, fontSize: 11, color, overflow: 'hidden',
+              fontWeight: 900, fontSize: 11, color: ad.posterLogo ? color : 'white', overflow: 'hidden',
             }}>
               {ad.posterLogo
                 ? <img src={ad.posterLogo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 3 }} />

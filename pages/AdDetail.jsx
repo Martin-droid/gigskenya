@@ -9,15 +9,15 @@ import {
 import { getAd, incrementAdViews, incrementAdContact, reportListing, getHirerProfile } from '../lib/firestore';
 import { requireAuth, saveIntent } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
-import { avatarColor } from '../lib/colors';
+import { avatarColor, DARK_TILE } from '../lib/colors';
 
 function Avatar({ src, name, color, size = 48 }) {
   const initials = (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: src ? 'transparent' : `${color}20`, border: `2.5px solid ${color}30`, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div style={{ width: size, height: size, borderRadius: '50%', background: src ? 'white' : DARK_TILE, border: `2.5px solid ${color}30`, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       {src
         ? <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        : <span style={{ fontWeight: 800, fontSize: size * 0.34, color, fontFamily: 'var(--font-display)' }}>{initials}</span>
+        : <span style={{ fontWeight: 800, fontSize: size * 0.34, color: 'white', fontFamily: 'var(--font-display)' }}>{initials}</span>
       }
     </div>
   );

@@ -10,7 +10,7 @@ import {
 import { getAds, getTalents } from '../lib/firestore';
 import { TalentCard } from './Talent';
 import { useAuth } from '../context/AuthContext';
-import { hashIndex, avatarColor } from '../lib/colors';
+import { hashIndex, avatarColor, darkGradient, GOLD_GRADIENT, DARK_TILE } from '../lib/colors';
 import { timeAgo } from '../lib/time';
 import './Home.css';
 
@@ -287,7 +287,7 @@ export function AdCard({ ad, navigate }) {
       {/* Top accent stripe */}
       <div style={{
         height: 3,
-        background: ad.boosted ? 'linear-gradient(90deg,#00A550,#00C060)' : `linear-gradient(90deg, ${color}, ${color}88)`,
+        background: ad.boosted ? GOLD_GRADIENT : darkGradient(color),
       }} />
 
       <div style={{ padding:'18px 20px 20px' }}>
@@ -296,7 +296,7 @@ export function AdCard({ ad, navigate }) {
         <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14 }}>
           <div style={{
             width:40, height:40, borderRadius:12, flexShrink:0, overflow:'hidden',
-            background: ad.posterLogo ? 'white' : 'linear-gradient(145deg,#1E293B,#334155)',
+            background: ad.posterLogo ? 'white' : DARK_TILE,
             border: ad.posterLogo ? '1px solid #E5E7EB' : 'none',
             display:'flex', alignItems:'center', justifyContent:'center',
             fontSize:13, fontWeight:800, color:'white', letterSpacing:'.01em',
