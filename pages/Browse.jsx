@@ -5,8 +5,9 @@ import {
   MapPin, Phone, MessageSquare, Briefcase, Zap, Star,
 } from 'lucide-react';
 import { getAds } from '../lib/firestore';
-import { requireAuth } from '../lib/authGuard';
+import { requireAuth, goToPostJob } from '../lib/authGuard';
 import { useAuth } from '../context/AuthContext';
+import { CATEGORIES } from '../lib/categories';
 import './Home.css';
 import SEO from '../components/SEO';
 
@@ -17,16 +18,11 @@ const PAGE_SIZE = 12;
 
 const LOCS = ['All Kenya', 'Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Nakuru', 'Thika', 'Remote'];
 
+// id === label === the exact string PostAdForm saves as ad.category —
+// keeps filtering an exact match instead of a fragile prefix guess.
 const CATS = [
-  { id: 'all',         label: 'All Categories' },
-  { id: 'tech',        label: 'Tech & Dev' },
-  { id: 'design',      label: 'Design' },
-  { id: 'writing',     label: 'Writing' },
-  { id: 'marketing',   label: 'Marketing' },
-  { id: 'media',       label: 'Photo & Video' },
-  { id: 'business',    label: 'Business' },
-  { id: 'support',     label: 'Support & VA' },
-  { id: 'translation', label: 'Translation' },
+  { id: 'all', label: 'All Categories' },
+  ...CATEGORIES.map(c => ({ id: c, label: c })),
 ];
 
 const AVATAR_COLORS = ['#4F46E5', '#EC4899', '#F59E0B', '#10B981', '#EF4444', '#8B5CF6', '#06B6D4', '#F97316'];
@@ -283,11 +279,15 @@ export function AdCard({ ad, navigate }) {
           <div style={{ display: 'flex', gap: 9, alignItems: 'center', minWidth: 0 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 9, flexShrink: 0,
-              background: `${color}14`,
+              background: ad.posterLogo ? 'white' : `${color}14`,
+              border: ad.posterLogo ? '1px solid #F0F2F5' : 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 900, fontSize: 11, color,
+              fontWeight: 900, fontSize: 11, color, overflow: 'hidden',
             }}>
-              {inits}
+              {ad.posterLogo
+                ? <img src={ad.posterLogo} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 3 }} />
+                : inits
+              }
             </div>
             <div style={{ minWidth: 0 }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
@@ -380,6 +380,8 @@ export default function Browse() {
   const [sp] = useSearchParams();
   const navigate = useNavigate();
   const topRef = useRef(null);
+  const { isAuthenticated } = useAuth();
+  const postJob = () => goToPostJob(navigate, isAuthenticated);
 
   const [q,           setQ]           = useState(() => sp.get('q')        || '');
   const [draftQ,      setDraftQ]      = useState(() => sp.get('q')        || '');
@@ -411,9 +413,8 @@ export default function Browse() {
   useEffect(() => { setPage(1); }, [q, type, cat, loc, sort]);
 
   const filtered = useMemo(() => {
-    const qL = q.toLowerCase();
-    const catSlug  = cat.toLowerCase();
-    const catLabel = CATS.find(c => c.id === cat)?.label?.toLowerCase();
+    const qL   = q.toLowerCase();
+    const catL = cat.toLowerCase();
 
     return ads
       .filter(a => {
@@ -424,11 +425,7 @@ export default function Browse() {
           || a.posterName?.toLowerCase().includes(qL)
           || tags.some(t => t.toLowerCase().includes(qL));
         const typeMatch = type === 'all' || a.type === type;
-        const adCat = (a.category || '').toLowerCase().trim();
-        const catMatch = cat === 'all'
-          || adCat === catSlug
-          || adCat === catLabel
-          || (catLabel && adCat.startsWith(catSlug));
+        const catMatch = cat === 'all' || (a.category || '').toLowerCase().trim() === catL;
         const locMatch = loc === 'All Kenya' || a.location?.toLowerCase().includes(loc.toLowerCase());
         return qMatch && typeMatch && catMatch && locMatch;
       })
@@ -508,7 +505,7 @@ export default function Browse() {
                 </span>
               )}
             </div>
-            <button onClick={() => navigate('/post-ad')} className="gk-btn-primary" style={{ padding: '8px 16px', fontSize: 13, flexShrink: 0 }}>
+            <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '8px 16px', fontSize: 13, flexShrink: 0 }}>
               <Plus size={13} /> Post Free
             </button>
           </div>
@@ -636,7 +633,7 @@ export default function Browse() {
                 <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 24, maxWidth: 340, margin: '0 auto 24px', lineHeight: 1.7 }}>
                   GigsKenya just launched. Post your service or job ad and be the first listing Kenyans see — completely free.
                 </p>
-                <button onClick={() => navigate('/post-ad')} className="gk-btn-primary" style={{ padding: '12px 28px', fontSize: 14, margin: '0 auto' }}>
+                <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '12px 28px', fontSize: 14, margin: '0 auto' }}>
                   Post a Free Ad →
                 </button>
               </>
@@ -651,8 +648,8 @@ export default function Browse() {
                   <button onClick={clearAll} style={{ padding: '11px 24px', fontSize: 14, borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', color: '#111827', cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                     Clear Filters
                   </button>
-                  <button onClick={() => navigate('/post-ad')} className="gk-btn-primary" style={{ padding: '11px 24px', fontSize: 14 }}>
-                    Post This Service →
+                  <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '11px 24px', fontSize: 14 }}>
+                    Post a Job →
                   </button>
                 </div>
               </>
@@ -709,7 +706,7 @@ export default function Browse() {
         <button onClick={() => setFiltersOpen(o => !o)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', color: '#111827', fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-display)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
           <SlidersHorizontal size={15} /> Filters{activeCt > 0 ? ` (${activeCt})` : ''}
         </button>
-        <button onClick={() => navigate('/post-ad')} className="gk-btn-primary" style={{ flex: 1, padding: '12px', fontSize: 14, justifyContent: 'center' }}>
+        <button onClick={() => postJob()} className="gk-btn-primary" style={{ flex: 1, padding: '12px', fontSize: 14, justifyContent: 'center' }}>
           <Plus size={15} /> Post Free
         </button>
       </div>

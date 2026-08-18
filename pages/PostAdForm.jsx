@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { createAd } from '../lib/firestore';
-
-const CATS = [
-  'Tech & Dev','Design','Writing & Content','Digital Marketing',
-  'Photo & Video','Business & Finance','Customer Support',
-  'Translation','Education & Tutoring','Other',
-];
+import { CATEGORIES as CATS } from '../lib/categories';
 const CITIES = [
   'Nairobi','Mombasa','Kisumu','Nakuru','Eldoret',
   'Thika','Remote / Online','Other',
@@ -42,7 +37,7 @@ function Spinner() {
   );
 }
 
-export default function PostAdForm({ uid, posterName, onSuccess }) {
+export default function PostAdForm({ uid, posterName, posterLogo, onSuccess }) {
   const [form, setForm] = useState({
     title: '',
     category: '',
@@ -84,6 +79,7 @@ export default function PostAdForm({ uid, posterName, onSuccess }) {
         tags:        form.tags.split(',').map(t => t.trim()).filter(Boolean),
         type:        'job',
         posterName,
+        posterLogo: posterLogo || null,
       });
       onSuccess();
     } catch (e) {
