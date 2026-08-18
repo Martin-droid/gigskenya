@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
+import { goToPostJob } from '../lib/authGuard';
 import {
   ArrowRight, FileText, Search, MessageSquare, Phone,
   Users, Briefcase, Zap, Shield, Globe, Star,
@@ -123,6 +125,8 @@ function FAQItem({ question, answer }) {
 export default function HowItWorks() {
   const [tab, setTab] = useState('hirer');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const postJobClick = e => goToPostJob(navigate, isAuthenticated, e);
   const steps = tab === 'hirer' ? HIRER_STEPS : TALENT_STEPS;
 
   return (
@@ -145,9 +149,9 @@ export default function HowItWorks() {
           A free marketplace connecting Kenyan freelancers and hirers — directly, with no middlemen and no fees.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/dashboard')} className="btn-primary" style={{ padding: '14px 32px', fontSize: 15 }}>
+          <Link to="/post-a-job" onClick={postJobClick} className="btn-primary" style={{ padding: '14px 32px', fontSize: 15 }}>
             Post a Job Ad <ArrowRight size={18} />
-          </button>
+          </Link>
           <button
             onClick={() => navigate('/register')}
             style={{ color: 'white', background: 'transparent', border: '2px solid rgba(255,255,255,0.25)', padding: '14px 32px', borderRadius: 8, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.2s' }}
@@ -199,20 +203,31 @@ export default function HowItWorks() {
           </div>
 
           <div style={{ marginTop: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-            <button
-              onClick={() => navigate(tab === 'hirer' ? '/dashboard' : '/register')}
-              className="btn-primary"
-              style={{ padding: '14px 36px', fontSize: 15 }}
-            >
-              {tab === 'hirer' ? 'Post a Job Ad Free' : 'Create Your Profile'} <ArrowRight size={18} />
-            </button>
-            {tab === 'hirer' && (
+            {tab === 'hirer' ? (
+              <Link
+                to="/post-a-job"
+                onClick={postJobClick}
+                className="btn-primary"
+                style={{ padding: '14px 36px', fontSize: 15 }}
+              >
+                Post a Job Ad Free <ArrowRight size={18} />
+              </Link>
+            ) : (
               <button
-                onClick={() => navigate('/talent')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--green)', fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-body)' }}
+                onClick={() => navigate('/register')}
+                className="btn-primary"
+                style={{ padding: '14px 36px', fontSize: 15 }}
+              >
+                Create Your Profile <ArrowRight size={18} />
+              </button>
+            )}
+            {tab === 'hirer' && (
+              <Link
+                to="/talent"
+                style={{ color: 'var(--green)', fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-body)' }}
               >
                 Or browse Kenyan freelancers directly →
-              </button>
+              </Link>
             )}
           </div>
         </div>

@@ -381,7 +381,7 @@ export default function Browse() {
   const navigate = useNavigate();
   const topRef = useRef(null);
   const { isAuthenticated } = useAuth();
-  const postJob = () => goToPostJob(navigate, isAuthenticated);
+  const postJobClick = e => goToPostJob(navigate, isAuthenticated, e);
 
   const [q,           setQ]           = useState(() => sp.get('q')        || '');
   const [draftQ,      setDraftQ]      = useState(() => sp.get('q')        || '');
@@ -505,9 +505,9 @@ export default function Browse() {
                 </span>
               )}
             </div>
-            <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '8px 16px', fontSize: 13, flexShrink: 0 }}>
+            <Link to="/post-a-job" onClick={postJobClick} className="gk-btn-primary" style={{ padding: '8px 16px', fontSize: 13, flexShrink: 0 }}>
               <Plus size={13} /> Post Free
-            </button>
+            </Link>
           </div>
 
           {/* Search row */}
@@ -633,9 +633,9 @@ export default function Browse() {
                 <p style={{ color: '#6B7280', fontSize: 14, marginBottom: 24, maxWidth: 340, margin: '0 auto 24px', lineHeight: 1.7 }}>
                   GigsKenya just launched. Post your service or job ad and be the first listing Kenyans see — completely free.
                 </p>
-                <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '12px 28px', fontSize: 14, margin: '0 auto' }}>
+                <Link to="/post-a-job" onClick={postJobClick} className="gk-btn-primary" style={{ padding: '12px 28px', fontSize: 14, margin: '0 auto' }}>
                   Post a Free Ad →
-                </button>
+                </Link>
               </>
             ) : (
               <>
@@ -648,9 +648,9 @@ export default function Browse() {
                   <button onClick={clearAll} style={{ padding: '11px 24px', fontSize: 14, borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', color: '#111827', cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
                     Clear Filters
                   </button>
-                  <button onClick={() => postJob()} className="gk-btn-primary" style={{ padding: '11px 24px', fontSize: 14 }}>
+                  <Link to="/post-a-job" onClick={postJobClick} className="gk-btn-primary" style={{ padding: '11px 24px', fontSize: 14 }}>
                     Post a Job →
-                  </button>
+                  </Link>
                 </div>
               </>
             )}
@@ -706,9 +706,9 @@ export default function Browse() {
         <button onClick={() => setFiltersOpen(o => !o)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1.5px solid #E5E7EB', background: 'white', color: '#111827', fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-display)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
           <SlidersHorizontal size={15} /> Filters{activeCt > 0 ? ` (${activeCt})` : ''}
         </button>
-        <button onClick={() => postJob()} className="gk-btn-primary" style={{ flex: 1, padding: '12px', fontSize: 14, justifyContent: 'center' }}>
+        <Link to="/post-a-job" onClick={postJobClick} className="gk-btn-primary" style={{ flex: 1, padding: '12px', fontSize: 14, justifyContent: 'center' }}>
           <Plus size={15} /> Post Free
-        </button>
+        </Link>
       </div>
 
       <style>{`

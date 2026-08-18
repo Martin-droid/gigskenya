@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { goToPostJob } from '../lib/authGuard';
@@ -47,7 +47,7 @@ export default function PostJob() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const yr = new Date().getFullYear();
-  const post = () => goToPostJob(navigate, isAuthenticated);
+  const postClick = e => goToPostJob(navigate, isAuthenticated, e);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -78,9 +78,9 @@ export default function PostJob() {
         <p style={{ color: 'rgba(255,255,255,.6)', fontSize: 17, maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.7 }}>
           Describe the role, set a budget, publish. Your ad is live instantly and Kenyan freelancers can reach you directly — no commission, no middleman.
         </p>
-        <button onClick={post} className="btn-primary" style={{ padding: '15px 34px', fontSize: 15 }}>
+        <Link to="/register?role=hirer" onClick={postClick} className="btn-primary" style={{ padding: '15px 34px', fontSize: 15 }}>
           Post a Job Free <ArrowRight size={18} />
-        </button>
+        </Link>
       </section>
 
       {/* 3 steps */}
@@ -138,9 +138,9 @@ export default function PostJob() {
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 800, color: 'white', marginBottom: 14 }}>
           Your next hire is a minute away.
         </h2>
-        <button onClick={post} className="btn-primary" style={{ padding: '15px 34px', fontSize: 15, margin: '0 auto' }}>
+        <Link to="/register?role=hirer" onClick={postClick} className="btn-primary" style={{ padding: '15px 34px', fontSize: 15, margin: '0 auto' }}>
           Post a Job Free <ArrowRight size={18} />
-        </button>
+        </Link>
       </section>
 
     </div>

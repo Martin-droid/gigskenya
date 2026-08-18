@@ -43,6 +43,7 @@ export default function Navbar() {
         <div className="desk" style={{ display:'flex', alignItems:'center', gap:2 }}>
           {nl('/browse', 'Browse Jobs')}
           {nl('/talent', 'Find Talent')}
+          {nl('/post-a-job', 'Post a Job')}
           {nl('/how-it-works', 'How It Works')}
         </div>
 
@@ -110,7 +111,7 @@ export default function Navbar() {
 
       {mob && (
         <div style={{ background:'white', borderTop:'1px solid var(--grey-200)', padding:'12px 24px 20px' }}>
-          {[{to:'/browse',l:'Browse Jobs'},{to:'/talent',l:'Find Talent'},{to:'/how-it-works',l:'How It Works'}].map(({to,l})=>(
+          {[{to:'/browse',l:'Browse Jobs'},{to:'/talent',l:'Find Talent'},{to:'/post-a-job',l:'Post a Job'},{to:'/how-it-works',l:'How It Works'}].map(({to,l})=>(
             <Link key={to} to={to} onClick={()=>setMob(false)} style={{ display:'block', padding:'12px 0', fontSize:15, color:'var(--grey-700)', borderBottom:'1px solid var(--grey-100)', fontWeight:500 }}>{l}</Link>
           ))}
           <div style={{ display:'flex', gap:10, marginTop:16 }}>
