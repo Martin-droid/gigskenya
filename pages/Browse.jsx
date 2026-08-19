@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import {
   Search, ChevronDown, X, Plus, SlidersHorizontal,
-  MapPin, Phone, MessageSquare, Star,
+  MapPin, Phone, MessageSquare, Star, Lock,
 } from 'lucide-react';
 import { getAds } from '../lib/firestore';
 import { requireAuth, goToPostJob } from '../lib/authGuard';
@@ -288,20 +288,35 @@ export function AdCard({ ad, navigate }) {
             </div>
           </div>
 
-          <button
-            onClick={handleContact}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '8px 14px', borderRadius: 10,
-              background: contactShown ? '#F0FDF4' : color,
-              color: contactShown ? '#16A34A' : 'white',
-              border: `1.5px solid ${contactShown ? '#86EFAC' : color}`,
-              fontSize: 12, fontWeight: 700, cursor: 'pointer',
-              transition: 'all .15s', flexShrink: 0,
-            }}
-          >
-            <Phone size={12} /> {contactShown ? 'Hide' : 'Contact'}
-          </button>
+          {ad._hidePhone ? (
+            <button
+              onClick={e => { e.stopPropagation(); e.preventDefault(); goToAd(); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 14px', borderRadius: 10,
+                background: '#FEF2F2', color: '#DC2626',
+                border: '1.5px solid #FECACA',
+                fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              <Lock size={12} /> Message only
+            </button>
+          ) : (
+            <button
+              onClick={handleContact}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 14px', borderRadius: 10,
+                background: contactShown ? '#F0FDF4' : color,
+                color: contactShown ? '#16A34A' : 'white',
+                border: `1.5px solid ${contactShown ? '#86EFAC' : color}`,
+                fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                transition: 'all .15s', flexShrink: 0,
+              }}
+            >
+              <Phone size={12} /> {contactShown ? 'Hide' : 'Contact'}
+            </button>
+          )}
         </div>
       </div>
 
