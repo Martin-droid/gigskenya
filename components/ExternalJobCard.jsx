@@ -7,6 +7,7 @@ import { formatPostedDate } from '../lib/arbeitnow';
 const SOURCE_STYLE = {
   arbeitnow:  { accent: '#2563EB' },
   theirstack: { accent: '#7C3AED' },
+  himalayas:  { accent: '#0D9488' },
 };
 
 // Expects a normalized job — see normalizeArbeitnowJob (lib/arbeitnow.js)
